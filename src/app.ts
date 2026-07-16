@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import config from "./config";
 import cookieParser from "cookie-parser";
+import { authRoute } from "./modules/auth/auth.route";
 
 const app: Application = express();
 
@@ -19,4 +20,5 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to RentNest API");
 });
 
+app.use("/api/auth", authRoute);
 export default app;
