@@ -1,10 +1,16 @@
 import { NextFunction, Request, Response } from "express";
+import { UserRole } from "../../../generated";
 
 // Extend Express Request to include `user` set by authentication middleware
 declare global {
   namespace Express {
     interface Request {
-      user?: { userId: string };
+      user?: {
+        email: string;
+        name: string;
+        id: string;
+        role: UserRole;
+      };
     }
   }
 }
@@ -32,11 +38,18 @@ const login = catchAsync(
       req.body,
     );
 
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "none",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     sendResponse(res, {
@@ -50,7 +63,7 @@ const login = catchAsync(
 
 const myProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await authService.myProfile(req.user!.userId);
+    const user = await authService.myProfile(req.user!.id);
 
     sendResponse(res, {
       success: true,
@@ -63,6 +76,7 @@ const myProfile = catchAsync(
 
 const logout = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
     sendResponse(res, {
       success: true,

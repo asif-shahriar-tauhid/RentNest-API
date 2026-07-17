@@ -65,7 +65,7 @@ const login = async (data: ILogin) => {
   if (!isPasswordMatch) throw new Error("Invalid credentials");
 
   const jwtPayload = {
-    Id: user.id,
+    id: user.id,
     email: user.email,
     role: user.role,
   };
