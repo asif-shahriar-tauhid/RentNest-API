@@ -17,7 +17,7 @@ const userSelect = {
 } as const;
 
 const register = async (data: IRegister) => {
-  if (!["TENANT", "LANDLORD"].includes(data.role)) {
+  if (!["TENANT", "ADMIN", "LANDLORD"].includes(data.role)) {
     throw new Error("Invalid role. Must be TENANT or LANDLORD.");
   }
 

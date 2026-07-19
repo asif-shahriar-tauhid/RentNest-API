@@ -7,13 +7,13 @@ import httpStatus from "http-status";
 
 const getAllUsers = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { user, meta } = await adminService.getAllUsers(req);
+        const { users, meta } = await adminService.getAllUsers(req);
 
         sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
-            message: "User profile fetched successfully",
-            data: { user, meta },
+            message: "Users fetched successfully",
+            data: { users, meta },
         });
     },
 );
@@ -44,7 +44,47 @@ const updateUserStatus = catchAsync(
             data: user,
         });
     }
-)
+);
+
+const getAllProperties = catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { properties, meta } = await adminService.getAllProperties(req);
+
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Properties fetched successfully",
+            data: { properties, meta },
+        });
+    }
+);
+
+const getAllRentals = catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { rentals, meta } = await adminService.getAllRentals(req);
+
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Rentals fetched successfully",
+            data: { rentals, meta },
+        });
+    }
+);
+
+const getAllPayments = catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { payments, meta } = await adminService.getAllPayments(req);
+
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Payments fetched successfully",
+            data: { payments, meta },
+        });
+    }
+);
+
 export const adminController = {
     getAllUsers,
     getUserById,

@@ -9,7 +9,7 @@ router.use(auth(UserRole.ADMIN));
 
 router.get("/users", adminController.getAllUsers);
 router.get("/users/:id", adminController.getUserById);
-router.patch("users/:id/status", adminController.updateUserStatus);
+router.patch("/users/:id/status", adminController.updateUserStatus);
 
 router.get("/properties", adminController.getAllProperties);
 router.get("/rentals", adminController.getAllRentals);
