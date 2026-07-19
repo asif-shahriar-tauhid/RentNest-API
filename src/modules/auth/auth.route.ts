@@ -12,6 +12,5 @@ router.get(
   auth(UserRole.ADMIN, UserRole.LANDLORD, UserRole.TENANT),
   authController.myProfile,
 );
-router.post("/logout", authController.logout);
 
 export const authRoute = router;
