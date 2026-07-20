@@ -67,13 +67,36 @@ const updateProperty = catchAsync(
 
 const deleteProperty = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
+        const id = req.params["id"] as string;
+        const property = await propertyService.deleteProperty(
+            id,
+            req.user!.id
+        )
 
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Property deleted successfully",
+            data: property,
+        });
     }
 )
 
 const updatePropertyStatus = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
+        const id = req.params["id"] as string;
+        const property = await propertyService.updatePropertyStatus(
+            id,
+            req.body.status,
+            req.user!.id
+        )
 
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Property status updated successfully",
+            data: property,
+        });
     }
 )
 
