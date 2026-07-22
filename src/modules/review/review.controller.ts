@@ -22,8 +22,19 @@ const createReview = catchAsync(
 )
 
 const getPropertyReviews = catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => { }
+    async (req: Request, res: Response, next: NextFunction) => {
+        const propertyId = req.params["propertyId"] as string;
+        const reviews = await reviewService.getPropertyReviews(propertyId);
+
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Reviews fetched successfully",
+            data: reviews
+        })
+    }
 )
+
 export const reviewController = {
     createReview,
     getPropertyReviews

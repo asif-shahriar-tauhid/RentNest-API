@@ -30,7 +30,7 @@ const rentalInclude = {
             }
         }
     },
-    payment: true,
+    payments: true,
 } as const;
 
 const createRentalRequest = async (
@@ -65,7 +65,7 @@ const createRentalRequest = async (
         data: {
             tenantId,
             propertyId: data.propertyId,
-            moveInDate: data.moveInDate,
+            moveInDate: new Date(data.moveInDate),
             duration: data.duration,
             message: data.message
         },
@@ -154,8 +154,8 @@ const updateRentalStatus = async (
         throw new Error("Only pending requests can be approved or rejected");
     }
 
-    if (!["APPROVED", "REJECTED"].includes(status)) {
-        throw new Error("Invalid status. Must be APPROVED/REJECTED.")
+    if (!["APPROVED", "REJECTED", "COMPLETED"].includes(status)) {
+        throw new Error("Invalid status. Must be APPROVED/REJECTED/COMPLETED.")
     }
 
     const updatedStatus = await prisma.rentalRequests.update({
