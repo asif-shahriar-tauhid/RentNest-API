@@ -40,7 +40,7 @@ const createProperty = catchAsync(
 
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: httpStatus.CREATED,
             message: "Property created successfully",
             data: property,
         });
