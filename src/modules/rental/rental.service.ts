@@ -3,6 +3,8 @@ import { prisma } from "../../lib/prisma";
 import { ICreateRentalInput } from "./rental.interface";
 import { getPagination } from "../../utils/pagination";
 import { RentalStatus } from "@prisma/client";
+import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status";
 
 const rentalInclude = {
     tenant: {
@@ -43,9 +45,9 @@ const createRentalRequest = async (
         }
     });
 
-    if (!property) throw new Error("Property not found");
+    if (!property) throw new AppError("Property not found", httpStatus.NOT_FOUND);
 
-    if (property.status !== "AVAILABLE") throw new Error("This property is not available for rent");
+    if (property.status !== "AVAILABLE") throw new AppError("This property is not available for rent", httpStatus.BAD_REQUEST);
 
     const existingPropertyRequest = await prisma.rentalRequests.findFirst({
         where: {
@@ -58,7 +60,7 @@ const createRentalRequest = async (
     });
 
     if (existingPropertyRequest) {
-        throw new Error("You have already have an active request for this property");
+        throw new AppError("You have already have an active request for this property", httpStatus.CONFLICT);
     }
 
     return prisma.rentalRequests.create({
@@ -120,12 +122,14 @@ const getRentalRequestById = async (
         include: rentalInclude
     })
 
+    if (!rental) throw new AppError("Rental request not found", httpStatus.NOT_FOUND);
+
     const isOwner =
-        rental?.tenantId === userId ||
-        rental?.property.landlordId === userId ||
+        rental.tenantId === userId ||
+        rental.property.landlordId === userId ||
         role === "ADMIN";
 
-    if (!isOwner) throw new Error("You are not authorized to access this rental request");
+    if (!isOwner) throw new AppError("You are not authorized to access this rental request", httpStatus.FORBIDDEN);
 
     return rental;
 }
@@ -145,17 +149,21 @@ const updateRentalStatus = async (
         }
     });
 
-    if (!rental) throw new Error("Rental request not found");
+    if (!rental) throw new AppError("Rental request not found", httpStatus.NOT_FOUND);
 
     if (rental.property.landlordId !== landlordId)
-        throw new Error("You are not authorized to update this rental request");
+        throw new AppError("You are not authorized to update this rental request", httpStatus.FORBIDDEN);
 
-    if (status === "APPROVED" && rental.status !== "PENDING") {
-        throw new Error("Only pending requests can be approved or rejected");
+    if ((status === "APPROVED" || status === "REJECTED") && rental.status !== "PENDING") {
+        throw new AppError("Only pending requests can be approved or rejected", httpStatus.BAD_REQUEST);
+    }
+
+    if (status === "COMPLETED" && rental.status !== "ACTIVE") {
+        throw new AppError("Only active rentals can be marked as completed", httpStatus.BAD_REQUEST);
     }
 
     if (!["APPROVED", "REJECTED", "COMPLETED"].includes(status)) {
-        throw new Error("Invalid status. Must be APPROVED/REJECTED/COMPLETED.")
+        throw new AppError("Invalid status. Must be APPROVED/REJECTED/COMPLETED.", httpStatus.BAD_REQUEST);
     }
 
     const updatedStatus = await prisma.rentalRequests.update({

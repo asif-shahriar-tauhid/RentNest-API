@@ -4,6 +4,8 @@ import { prisma } from "../../lib/prisma";
 import { jwtUtils } from "../../utils/jwt";
 import { ILogin, IRegister } from "./auth.interface";
 import bcrypt from "bcrypt";
+import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status";
 
 const userSelect = {
   id: true,
@@ -18,7 +20,7 @@ const userSelect = {
 
 const register = async (data: IRegister) => {
   if (!["TENANT", "ADMIN", "LANDLORD"].includes(data.role)) {
-    throw new Error("Invalid role. Must be TENANT or LANDLORD.");
+    throw new AppError("Invalid role. Must be TENANT or LANDLORD.", httpStatus.BAD_REQUEST);
   }
 
   const existingUser = await prisma.user.findUnique({
@@ -28,7 +30,7 @@ const register = async (data: IRegister) => {
   });
 
   if (existingUser) {
-    throw new Error("User already exists with this email.");
+    throw new AppError("User already exists with this email.", httpStatus.CONFLICT);
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 12);
@@ -53,16 +55,16 @@ const login = async (data: ILogin) => {
   });
 
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw new AppError("Invalid credentials", httpStatus.UNAUTHORIZED);
   }
 
   if (user.status === "BANNED") {
-    throw new Error("Your account has been banned. Please contact support.");
+    throw new AppError("Your account has been banned. Please contact support.", httpStatus.FORBIDDEN);
   }
 
   const isPasswordMatch = await bcrypt.compare(data.password, user.password);
 
-  if (!isPasswordMatch) throw new Error("Invalid credentials");
+  if (!isPasswordMatch) throw new AppError("Invalid credentials", httpStatus.UNAUTHORIZED);
 
   const jwtPayload = {
     id: user.id,
@@ -89,6 +91,8 @@ const myProfile = async (userId: string) => {
     where: {
       id: userId,
     },
+    // Explicitly select fields to ensure password hash is never returned
+    select: userSelect,
   });
 
   return user;

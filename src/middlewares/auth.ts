@@ -5,24 +5,12 @@ import { jwtUtils } from "../utils/jwt";
 import config from "../config";
 import { JwtPayload } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
-
-
-
-declare global {
-    namespace Express {
-        interface Request {
-            user?: {
-                email: string;
-                name: string;
-                id: string;
-                role: UserRole
-            }
-        }
-    }
-}
+import { AppError } from "../utils/AppError";
+import httpStatus from "http-status";
+import "../types/express";
 
 export const auth = (...requiredRoles: UserRole[]) => {
-    return catchAsync(async(req: Request, res: Response, next: NextFunction)=>{
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies.accessToken
       ? req.cookies.accessToken
       : req.headers.authorization?.startsWith("Bearer ")
@@ -30,8 +18,9 @@ export const auth = (...requiredRoles: UserRole[]) => {
         : req.headers.authorization;
 
     if (!token) {
-      throw new Error(
+      throw new AppError(
         "You are not logged in. Please log in to access this resource",
+        httpStatus.UNAUTHORIZED
       );
     }
 
@@ -41,14 +30,15 @@ export const auth = (...requiredRoles: UserRole[]) => {
     );
 
     if (!verifiedToken.success) {
-      throw new Error(verifiedToken.error);
+      throw new AppError(verifiedToken.error, httpStatus.UNAUTHORIZED);
     }
 
     const { email, id, role } = verifiedToken.data as JwtPayload;
 
     if (requiredRoles.length && !requiredRoles.includes(role)) {
-      throw new Error(
+      throw new AppError(
         "Forbidden. You don't have permission to access this source.",
+        httpStatus.FORBIDDEN
       );
     }
 
@@ -58,9 +48,9 @@ export const auth = (...requiredRoles: UserRole[]) => {
       },
     });
 
-    if (!existingUser) throw new Error("User not found. Please log in again.");
+    if (!existingUser) throw new AppError("User not found. Please log in again.", httpStatus.UNAUTHORIZED);
     if (existingUser.status === "BANNED")
-      throw new Error("Your account is blocked. Please contact support");
+      throw new AppError("Your account is blocked. Please contact support", httpStatus.FORBIDDEN);
 
     req.user = {
       email: existingUser.email,
@@ -70,5 +60,5 @@ export const auth = (...requiredRoles: UserRole[]) => {
     };
 
     next();
-    })
+  })
 }

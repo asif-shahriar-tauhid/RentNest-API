@@ -1,0 +1,717 @@
+{
+  "info": {
+    "_postman_id": "ba6b9b8d-9896-4236-b148-7047ae0644a7",
+    "name": "RentNest API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54703524",
+    "_collection_link": "https://go.postman.co/collection/54703524-ba6b9b8d-9896-4236-b148-7047ae0644a7?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Admin Route",
+      "item": [
+        {
+          "name": "Get all users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:5000/api/admin/users",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get user by Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:5000/api/admin/users/55fdbd13-1056-4f61-bf91-4a8af84f3641",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "55fdbd13-1056-4f61-bf91-4a8af84f3641"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update user status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"ACTIVE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/admin/users/55fdbd13-1056-4f61-bf91-4a8af84f3641/status",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "55fdbd13-1056-4f61-bf91-4a8af84f3641",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Property Route",
+      "item": [
+        {
+          "name": "Get All Properties",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"admin1@rentnest.com\",\n    \"password\":\"password\"\n}"
+            },
+            "url": {
+              "raw": "localhost:5000/api/property",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "property"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Property",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Modern 2BHK Mountain House\",\r\n  \"description\": \"Spacious 2 story building featuring modern amenities, balcony view, and high-speed internet access.\",\r\n  \"address\": \"House 10, Road 9, Block C, Chittagong Hill Tract\",\r\n  \"city\": \"Dhaka\",\r\n  \"district\": \"Dhaka\",\r\n  \"rentAmount\": 98000,\r\n  \"bedrooms\": 3,\r\n  \"bathrooms\": 2,\r\n  \"area\": 1850,\r\n  \"amenities\": [\r\n    \"WiFi\",\r\n    \"Parking\",\r\n    \"Lift\",\r\n    \"24/7 Security\",\r\n    \"Generator Backup\"\r\n  ],\r\n  \"images\": [\r\n    \"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267\",\r\n    \"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688\"\r\n  ],\r\n  \"categoryId\": \"ea7b1655-f0da-4836-9509-97f82d501041\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/property/",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "property",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property by Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:5000/api/property/c0c1ceda-0c96-47e8-aed1-94e8be075009",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "property",
+                "c0c1ceda-0c96-47e8-aed1-94e8be075009"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Property",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"city\" : \"Tongi\",\r\n    \"district\" : \"Gazipur\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/property/c0c1ceda-0c96-47e8-aed1-94e8be075009",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "property",
+                "c0c1ceda-0c96-47e8-aed1-94e8be075009"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete property",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:5000/api/property/261d3478-d891-4220-913e-408ee962ca42",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "property",
+                "261d3478-d891-4220-913e-408ee962ca42"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Property Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\":\"AVAILABLE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/property/c0c1ceda-0c96-47e8-aed1-94e8be075009/status",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "property",
+                "c0c1ceda-0c96-47e8-aed1-94e8be075009",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Category Route",
+      "item": [
+        {
+          "name": "Create Categories",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Land\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/categories/",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "categories",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Categories",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"House\"\r\n}"
+            },
+            "url": {
+              "raw": "localhost:5000/api/categories/",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "categories",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category By Id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"House\"\r\n}"
+            },
+            "url": {
+              "raw": "localhost:5000/api/categories/61d44abc-2367-4c2e-bae4-1de28678f00f",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "categories",
+                "61d44abc-2367-4c2e-bae4-1de28678f00f"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Mountain\",\r\n    \"description\":\"This is a land based on a mountain surface.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/categories/47945c3f-679e-4bf9-a27b-a64d44a5289e",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "categories",
+                "47945c3f-679e-4bf9-a27b-a64d44a5289e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:5000/api/categories/47945c3f-679e-4bf9-a27b-a64d44a5289e",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "categories",
+                "47945c3f-679e-4bf9-a27b-a64d44a5289e"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Rental Route",
+      "item": [
+        {
+          "name": "Create Rental request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"propertyId\": \"6aee3b28-a276-4b6d-9a86-682ac9379a83\",\n  \"moveInDate\": \"2026-08-01\",\n  \"duration\": 6,\n  \"message\": \"Hi, I am interested in renting this apartment starting from next month for 6 months.\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/rentals",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "rentals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Rental requests",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"admin1@rentnest.com\",\n    \"password\":\"password\"\n}"
+            },
+            "url": {
+              "raw": "localhost:5000/api/rentals",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "rentals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Rental Request By ID",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"admin1@rentnest.com\",\n    \"password\":\"password\"\n}"
+            },
+            "url": {
+              "raw": "localhost:5000/api/rentals/f0ebca16-0ac8-455b-92a7-2d750153c76b",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "rentals",
+                "f0ebca16-0ac8-455b-92a7-2d750153c76b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Rental Request",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\":\"APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/rentals/bc2827a8-36f3-4a3e-b621-07d90b76b76f/status",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "rentals",
+                "bc2827a8-36f3-4a3e-b621-07d90b76b76f",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Review Route",
+      "item": [
+        {
+          "name": "Create review",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"rentalRequestId\":\"f0ebca16-0ac8-455b-92a7-2d750153c76b\",\n    \"propertyId\":\"c0c1ceda-0c96-47e8-aed1-94e8be075009\",\n    \"rating\":5,\n    \"comment\":\"This is a nice apartment\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:5000/api/reviews",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property Reviews",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"admin1@rentnest.com\",\n    \"password\":\"password\"\n}"
+            },
+            "url": {
+              "raw": "localhost:5000/api/property/c0c1ceda-0c96-47e8-aed1-94e8be075009",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "property",
+                "c0c1ceda-0c96-47e8-aed1-94e8be075009"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Route",
+      "item": [
+        {
+          "name": "Payment Testing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rentalRequestId\": \"07340c1b-2f48-4d57-879e-080dc135ee84\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/payments/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "payments",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Payment Confirmation",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"sessionId\": \"cs_test_a1F1SJv71zxmcX4eOYyYgitVZZFzdYqd7QpCBKG2T0DeGMQhR8kwWBBf1x\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/payments/confirm",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "payments",
+                "confirm"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\":\"tenant2\",\n    \"email\":\"tenant2@rentnest.com\",\n    \"password\":\"password\",\n    \"role\":\"LANDLORD\",\n    \"phone\":\"01999999999\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:5000/api/auth/register",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"tenant1@rentnest.com\",\n    \"password\":\"password\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:5000/api/auth/login",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Fetch profile",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"a31@st.com\",\n    \"password\":\"password\"\n}"
+        },
+        "url": {
+          "raw": "localhost:5000/api/auth/me",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "api",
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

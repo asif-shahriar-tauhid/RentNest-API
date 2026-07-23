@@ -3,6 +3,8 @@ import { getPagination } from "../../utils/pagination"
 import { prisma } from "../../lib/prisma";
 import { ICreateProperty } from "./property.interface";
 import { PropertyStatus } from "@prisma/client";
+import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status";
 
 const getAllProperties = async (req: Request) => {
     const { page, limit, skip } = getPagination(req);
@@ -82,7 +84,7 @@ const getPropertyById = async (id: string) => {
     });
 
     if (!property) {
-        throw new Error("Property not found");
+        throw new AppError("Property not found", httpStatus.NOT_FOUND);
     }
 
     return property;
@@ -94,7 +96,7 @@ const createProperty = async (data: ICreateProperty, landlordId: string) => {
     });
 
     if (!category) {
-        throw new Error("Category not found");
+        throw new AppError("Category not found", httpStatus.NOT_FOUND);
     }
 
     const property = await prisma.property.create({
@@ -125,11 +127,11 @@ const updateProperty = async (id: string, data: Partial<ICreateProperty>, landlo
     });
 
     if (!property) {
-        throw new Error("Property not found");
+        throw new AppError("Property not found", httpStatus.NOT_FOUND);
     }
 
     if (property.landlordId !== landlordId) {
-        throw new Error("You are not authorized to update this property");
+        throw new AppError("You are not authorized to update this property", httpStatus.FORBIDDEN);
     }
 
     if (data.categoryId) {
@@ -137,7 +139,7 @@ const updateProperty = async (id: string, data: Partial<ICreateProperty>, landlo
             where: { id: data.categoryId }
         });
         if (!category) {
-            throw new Error("Category not found");
+            throw new AppError("Category not found", httpStatus.NOT_FOUND);
         }
     }
 
@@ -178,11 +180,25 @@ const deleteProperty = async (id: string, landlordId: string) => {
     });
 
     if (!property) {
-        throw new Error("Property not found");
+        throw new AppError("Property not found", httpStatus.NOT_FOUND);
     }
 
     if (property.landlordId !== landlordId) {
-        throw new Error("You are not authorized to delete this property");
+        throw new AppError("You are not authorized to delete this property", httpStatus.FORBIDDEN);
+    }
+
+    const activeRentalCount = await prisma.rentalRequests.count({
+        where: {
+            propertyId: id,
+            status: { in: ["PENDING", "APPROVED", "ACTIVE"] },
+        },
+    });
+
+    if (activeRentalCount > 0) {
+        throw new AppError(
+            "Cannot delete a property with pending, approved, or active rental requests.",
+            httpStatus.CONFLICT
+        );
     }
 
     const deletedProperty = await prisma.property.delete({
@@ -198,11 +214,11 @@ const updatePropertyStatus = async (id: string, status: PropertyStatus, landlord
     });
 
     if (!property) {
-        throw new Error("Property not found");
+        throw new AppError("Property not found", httpStatus.NOT_FOUND);
     }
 
     if (property.landlordId !== landlordId) {
-        throw new Error("You are not authorized to update this property status");
+        throw new AppError("You are not authorized to update this property status", httpStatus.FORBIDDEN);
     }
 
     const updatedProperty = await prisma.property.update({

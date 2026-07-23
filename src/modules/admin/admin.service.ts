@@ -2,6 +2,8 @@ import { Request } from "express"
 import { getPagination } from "../../utils/pagination";
 import { UserRole, UserStatus } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status";
 
 const getAllUsers = async (req: Request) => {
     const { page, limit, skip } = getPagination(req);
@@ -63,20 +65,20 @@ const getUserById = async (id: string) => {
         },
     });
 
-    if (!user) throw new Error("User not found");
+    if (!user) throw new AppError("User not found", httpStatus.NOT_FOUND);
     return user;
 }
 
 const updateUserStatus = async (id: string, status: UserStatus) => {
     if (!["ACTIVE", "BANNED"].includes(status))
-        throw new Error("Invalid status");
+        throw new AppError("Invalid status", httpStatus.BAD_REQUEST);
 
     const user = await prisma.user.findUnique({
         where: { id }
     })
-    if (!user) throw new Error("User not found");
+    if (!user) throw new AppError("User not found", httpStatus.NOT_FOUND);
     if (user.role === "ADMIN")
-        throw new Error("Cannot update admin status");
+        throw new AppError("Cannot update admin status", httpStatus.FORBIDDEN);
 
     const updatedUser = await prisma.user.update({
         where: { id },
@@ -94,17 +96,61 @@ const updateUserStatus = async (id: string, status: UserStatus) => {
     return updatedUser;
 }
 
-const getAllProperties = async () => {
+const getAllProperties = async (req: Request) => {
+    const { page, limit, skip } = getPagination(req);
+    const [total, properties] = await Promise.all([
+        prisma.property.count(),
+        prisma.property.findMany({
+            skip,
+            take: limit,
+            orderBy: { createdAt: "desc" },
+            include: {
+                landlord: { select: { id: true, name: true, email: true } },
+                category: true,
+            },
+        }),
+    ]);
+    return { properties, meta: { page, limit, total } };
+};
 
-}
+const getAllRentals = async (req: Request) => {
+    const { page, limit, skip } = getPagination(req);
+    const [total, rentals] = await Promise.all([
+        prisma.rentalRequests.count(),
+        prisma.rentalRequests.findMany({
+            skip,
+            take: limit,
+            orderBy: { createdAt: "desc" },
+            include: {
+                property: { select: { id: true, title: true, rentAmount: true } },
+                tenant: { select: { id: true, name: true, email: true } },
+            },
+        }),
+    ]);
+    return { rentals, meta: { page, limit, total } };
+};
 
-const getAllRentals = async () => {
+const getAllPayments = async (req: Request) => {
+    const { page, limit, skip } = getPagination(req);
+    const [total, payments] = await Promise.all([
+        prisma.payment.count(),
+        prisma.payment.findMany({
+            skip,
+            take: limit,
+            orderBy: { createdAt: "desc" },
+            include: {
+                rentalRequest: {
+                    include: {
+                        property: { select: { id: true, title: true } },
+                        tenant: { select: { id: true, name: true, email: true } },
+                    },
+                },
+            },
+        }),
+    ]);
+    return { payments, meta: { page, limit, total } };
+};
 
-}
-
-const getAllPayments = async () => {
-
-}
 
 export const adminService = {
     getAllUsers,

@@ -7,10 +7,10 @@ export interface PaginationOptions {
 }
 
 export const getPagination = (req: Request): PaginationOptions => {
-    const page = Math.max(1, parseInt(String(req.query["page"] ?? "1")));
+    const page = Math.max(1, parseInt(String(req.query["page"] ?? "1")) || 1);
     const limit = Math.min(
         100,
-        Math.max(1, parseInt(String(req.query["limit"] ?? "10")))
+        Math.max(1, parseInt(String(req.query["limit"] ?? "10")) || 10)
     );
     const skip = (page - 1) * limit;
     return { page, limit, skip };

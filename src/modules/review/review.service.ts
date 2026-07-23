@@ -1,13 +1,15 @@
 import { RentalStatus } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
-import { ICreateReviewInput } from "./review.interface"
+import { ICreateReviewInput } from "./review.interface";
+import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status";
 
 const createReview = async (
     data: ICreateReviewInput,
     tenantId: string,
 ) => {
     if (data.rating < 1 || data.rating > 5)
-        throw new Error("Rating must be between 1 and 5");
+        throw new AppError("Rating must be between 1 and 5", httpStatus.BAD_REQUEST);
 
     const verifyRentalRequest = await prisma.rentalRequests.findUnique({
         where: {
@@ -15,13 +17,16 @@ const createReview = async (
         }
     });
 
-    if (!verifyRentalRequest) throw new Error("Rental request not found.");
+    if (!verifyRentalRequest) throw new AppError("Rental request not found.", httpStatus.NOT_FOUND);
 
     if (verifyRentalRequest.tenantId !== tenantId)
-        throw new Error("You can only review your own rentals.");
+        throw new AppError("You can only review your own rentals.", httpStatus.FORBIDDEN);
 
-    if (verifyRentalRequest.status !== RentalStatus.COMPLETED || RentalStatus.APPROVED)
-        throw new Error("You can only review completed/approved rentals.");
+    if (verifyRentalRequest.propertyId !== data.propertyId)
+        throw new AppError("Property ID does not match the rental request.", httpStatus.BAD_REQUEST);
+
+    if (verifyRentalRequest.status !== RentalStatus.COMPLETED)
+        throw new AppError("You can only review completed rentals.", httpStatus.BAD_REQUEST);
 
     const existingReview = await prisma.review.findUnique({
         where: {
@@ -30,7 +35,7 @@ const createReview = async (
     });
 
     if (existingReview)
-        throw new Error("You have already reviewed this rental.");
+        throw new AppError("You have already reviewed this rental.", httpStatus.CONFLICT);
 
     return prisma.review.create({
         data: {

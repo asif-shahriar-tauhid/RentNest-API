@@ -1,19 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { UserRole } from "../../../generated";
-
-// Extend Express Request to include `user` set by authentication middleware
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        email: string;
-        name: string;
-        id: string;
-        role: UserRole;
-      };
-    }
-  }
-}
+import "../../types/express";
 import { catchAsync } from "../../utils/catchAsync";
 import { authService } from "./auth.service";
 import { sendResponse } from "../../utils/sendResponse";
