@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { UserRole } from "../../generated";
+import { UserRole } from "@prisma/client";
 import { catchAsync } from "../utils/catchAsync";
 import { jwtUtils } from "../utils/jwt";
 import config from "../config";

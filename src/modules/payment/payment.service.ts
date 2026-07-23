@@ -25,7 +25,7 @@ export const createStripePayment = async (
         throw new AppError("Rental request must be approved before payment.", 400);
 
     const hasExistingPayment = rental.payments.some(
-        (p) => p.status !== "FAILED"
+        (p: { status: string }) => p.status !== "FAILED"
     );
 
     if (hasExistingPayment)
