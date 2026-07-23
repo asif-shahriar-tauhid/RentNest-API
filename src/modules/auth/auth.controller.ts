@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import "../../types/express";
 import { catchAsync } from "../../utils/catchAsync";
 import { authService } from "./auth.service";
 import { sendResponse } from "../../utils/sendResponse";

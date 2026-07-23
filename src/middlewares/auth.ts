@@ -7,7 +7,6 @@ import { JwtPayload } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/AppError";
 import httpStatus from "http-status";
-import "../types/express";
 
 export const auth = (...requiredRoles: UserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
