@@ -15,7 +15,6 @@
 
 - 🌐 **Live API Base URL**: [https://rentnestb7a4.vercel.app](https://rentnestb7a4.vercel.app)
 - 📚 **Interactive Postman Documentation**: [Postman Docs](https://documenter.getpostman.com/view/54703524/2sBY4QsKkB)
-- 📦 **Postman Collection File**: [`RentNest API.postman_collection.json`](file:///d:/Code/PH%20Level2%20Assignments/B7A4-RentNestAPI/RentNest%20API.postman_collection.json)
 - 💻 **GitHub Repository**: [https://github.com/asif-shahriar-tauhid/RentNest-API](https://github.com/asif-shahriar-tauhid/RentNest-API)
 
 ---

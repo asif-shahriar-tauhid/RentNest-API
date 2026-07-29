@@ -10,15 +10,32 @@ const getAllProperties = async (req: Request) => {
     const { page, limit, skip } = getPagination(req);
 
     const where: Record<string, unknown> = { status: "AVAILABLE" }
-    if (req.query["city"]) where["city"] = { contains: req.query.city as string, mode: "insensitive" }
+    if (req.query["city"]) {
+        const searchTerm = req.query.city as string;
+        where["OR"] = [
+            { city: { contains: searchTerm, mode: "insensitive" } },
+            { district: { contains: searchTerm, mode: "insensitive" } },
+            { address: { contains: searchTerm, mode: "insensitive" } },
+            { title: { contains: searchTerm, mode: "insensitive" } },
+        ];
+    }
     if (req.query["categoryId"]) where["categoryId"] = req.query["categoryId"]
-    if (req.query["minRent"] || req.query["maxRent"]) {
+    const minRentVal = req.query["minRent"] || req.query["minPrice"];
+    const maxRentVal = req.query["maxRent"] || req.query["maxPrice"];
+    if (minRentVal || maxRentVal) {
         where["rentAmount"] = {
-            ...(req.query["minRent"] ? { gte: Number(req.query["minRent"]) } : {}),
-            ...(req.query["maxRent"] ? { lte: Number(req.query["maxRent"]) } : {}),
+            ...(minRentVal ? { gte: Number(minRentVal) } : {}),
+            ...(maxRentVal ? { lte: Number(maxRentVal) } : {}),
         }
     }
-    if (req.query["bedrooms"]) where["bedrooms"] = Number(req.query["bedrooms"])
+    if (req.query["bedrooms"]) {
+        const beds = Number(req.query["bedrooms"]);
+        if (beds >= 4) {
+            where["bedrooms"] = { gte: 4 };
+        } else {
+            where["bedrooms"] = beds;
+        }
+    }
 
     const [total, properties] = await Promise.all([
         prisma.property.count({ where }),
