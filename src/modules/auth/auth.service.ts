@@ -42,6 +42,7 @@ const register = async (data: IRegister) => {
       password: hashedPassword,
       role: data.role,
       phone: data.phone,
+      profileImage: data.profileImage,
     },
     select: userSelect,
   });

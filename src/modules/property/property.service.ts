@@ -9,7 +9,20 @@ import httpStatus from "http-status";
 const getAllProperties = async (req: Request) => {
     const { page, limit, skip } = getPagination(req);
 
-    const where: Record<string, unknown> = { status: "AVAILABLE" }
+    const where: Record<string, unknown> = {};
+
+    if (req.query["landlordId"]) {
+        where["landlordId"] = req.query["landlordId"];
+    }
+
+    if (req.query["status"]) {
+        if (req.query["status"] !== "ALL") {
+            where["status"] = req.query["status"];
+        }
+    } else if (!req.query["landlordId"]) {
+        where["status"] = "AVAILABLE";
+    }
+
     if (req.query["city"]) {
         const searchTerm = req.query.city as string;
         where["OR"] = [
@@ -19,7 +32,7 @@ const getAllProperties = async (req: Request) => {
             { title: { contains: searchTerm, mode: "insensitive" } },
         ];
     }
-    if (req.query["categoryId"]) where["categoryId"] = req.query["categoryId"]
+    if (req.query["categoryId"]) where["categoryId"] = req.query["categoryId"];
     const minRentVal = req.query["minRent"] || req.query["minPrice"];
     const maxRentVal = req.query["maxRent"] || req.query["maxPrice"];
     if (minRentVal || maxRentVal) {
@@ -118,10 +131,20 @@ const createProperty = async (data: ICreateProperty, landlordId: string) => {
 
     const property = await prisma.property.create({
         data: {
-            ...data,
+            title: data.title,
+            description: data.description,
+            address: data.address,
+            city: data.city,
+            district: data.district,
+            rentAmount: Number(data.rentAmount),
+            bedrooms: Number(data.bedrooms),
+            bathrooms: Number(data.bathrooms),
+            area: data.area ? Number(data.area) : null,
+            categoryId: data.categoryId,
             landlordId,
             amenities: data.amenities ?? [],
             images: data.images ?? [],
+            status: data.status || "AVAILABLE",
         },
         include: {
             landlord: {
@@ -175,6 +198,7 @@ const updateProperty = async (id: string, data: Partial<ICreateProperty>, landlo
             amenities: data.amenities,
             images: data.images,
             categoryId: data.categoryId,
+            ...(data.status ? { status: data.status } : {}),
         },
         include: {
             landlord: {

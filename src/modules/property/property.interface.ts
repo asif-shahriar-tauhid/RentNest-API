@@ -1,3 +1,5 @@
+import { PropertyStatus } from "@prisma/client";
+
 export interface ICreateProperty {
     title: string;
     description: string;
@@ -11,5 +13,5 @@ export interface ICreateProperty {
     amenities?: string[];
     images?: string[];
     categoryId: string;
+    status?: PropertyStatus;
 }
-

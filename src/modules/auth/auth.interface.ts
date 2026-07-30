@@ -6,6 +6,7 @@ export interface IRegister {
   password: string;
   role: UserRole;
   phone?: string;
+  profileImage?: string;
 }
 
 export interface ILogin {
