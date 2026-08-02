@@ -5,17 +5,26 @@ import { sendResponse } from "../../utils/sendResponse.js";
 import httpStatus from "http-status";
 
 const createPayment = catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: Request, res: Response, _next: NextFunction) => {
+        const originHeader =
+            req.headers.origin ||
+            (req.headers.referer
+                ? new URL(req.headers.referer).origin
+                : undefined);
+        const redirectBaseUrl =
+            req.body.origin || req.body.redirectUrl || originHeader;
+
         const result = await paymentService.createStripePayment(
             req.body.rentalRequestId as string,
-            req.user!.id
+            req.user!.id,
+            redirectBaseUrl
         );
         sendResponse(res, {
             success: true,
             statusCode: httpStatus.CREATED,
             message: "Payment session created successfully",
             data: result,
-        })
+        });
     }
 );
 

@@ -8,7 +8,8 @@ import { AppError } from "../../utils/AppError";
 
 export const createStripePayment = async (
     rentalRequestId: string,
-    tenantId: string
+    tenantId: string,
+    redirectBaseUrl?: string
 ) => {
     const rental = await prisma.rentalRequests.findUnique({
         where: { id: rentalRequestId },
@@ -33,6 +34,12 @@ export const createStripePayment = async (
 
     const totalAmount = rental.property.rentAmount * rental.duration;
 
+    const baseUrl = (
+        redirectBaseUrl ||
+        config.app_url ||
+        "http://localhost:3000"
+    ).replace(/\/$/, "");
+
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
@@ -53,8 +60,8 @@ export const createStripePayment = async (
             rentalRequestId,
             tenantId,
         },
-        success_url: `${config.app_url ?? "http://localhost:3000"}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${config.app_url ?? "http://localhost:3000"}/payment/cancel`,
+        success_url: `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/payment/cancel`,
     });
 
     try {

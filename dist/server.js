@@ -136,7 +136,8 @@ var register = async (data) => {
       email: data.email,
       password: hashedPassword,
       role: data.role,
-      phone: data.phone
+      phone: data.phone,
+      profileImage: data.profileImage
     },
     select: userSelect
   });
@@ -581,16 +582,43 @@ import { Router as Router3 } from "express";
 import httpStatus6 from "http-status";
 var getAllProperties3 = async (req) => {
   const { page, limit, skip } = getPagination(req);
-  const where = { status: "AVAILABLE" };
-  if (req.query["city"]) where["city"] = { contains: req.query.city, mode: "insensitive" };
+  const where = {};
+  if (req.query["landlordId"]) {
+    where["landlordId"] = req.query["landlordId"];
+  }
+  if (req.query["status"]) {
+    if (req.query["status"] !== "ALL") {
+      where["status"] = req.query["status"];
+    }
+  } else if (!req.query["landlordId"]) {
+    where["status"] = "AVAILABLE";
+  }
+  if (req.query["city"]) {
+    const searchTerm = req.query.city;
+    where["OR"] = [
+      { city: { contains: searchTerm, mode: "insensitive" } },
+      { district: { contains: searchTerm, mode: "insensitive" } },
+      { address: { contains: searchTerm, mode: "insensitive" } },
+      { title: { contains: searchTerm, mode: "insensitive" } }
+    ];
+  }
   if (req.query["categoryId"]) where["categoryId"] = req.query["categoryId"];
-  if (req.query["minRent"] || req.query["maxRent"]) {
+  const minRentVal = req.query["minRent"] || req.query["minPrice"];
+  const maxRentVal = req.query["maxRent"] || req.query["maxPrice"];
+  if (minRentVal || maxRentVal) {
     where["rentAmount"] = {
-      ...req.query["minRent"] ? { gte: Number(req.query["minRent"]) } : {},
-      ...req.query["maxRent"] ? { lte: Number(req.query["maxRent"]) } : {}
+      ...minRentVal ? { gte: Number(minRentVal) } : {},
+      ...maxRentVal ? { lte: Number(maxRentVal) } : {}
     };
   }
-  if (req.query["bedrooms"]) where["bedrooms"] = Number(req.query["bedrooms"]);
+  if (req.query["bedrooms"]) {
+    const beds = Number(req.query["bedrooms"]);
+    if (beds >= 4) {
+      where["bedrooms"] = { gte: 4 };
+    } else {
+      where["bedrooms"] = beds;
+    }
+  }
   const [total, properties] = await Promise.all([
     prisma.property.count({ where }),
     prisma.property.findMany({
@@ -665,10 +693,20 @@ var createProperty = async (data, landlordId) => {
   }
   const property = await prisma.property.create({
     data: {
-      ...data,
+      title: data.title,
+      description: data.description,
+      address: data.address,
+      city: data.city,
+      district: data.district,
+      rentAmount: Number(data.rentAmount),
+      bedrooms: Number(data.bedrooms),
+      bathrooms: Number(data.bathrooms),
+      area: data.area ? Number(data.area) : null,
+      categoryId: data.categoryId,
       landlordId,
       amenities: data.amenities ?? [],
-      images: data.images ?? []
+      images: data.images ?? [],
+      status: data.status || "AVAILABLE"
     },
     include: {
       landlord: {
@@ -715,7 +753,8 @@ var updateProperty = async (id, data, landlordId) => {
       area: data.area !== void 0 ? data.area ? Number(data.area) : null : void 0,
       amenities: data.amenities,
       images: data.images,
-      categoryId: data.categoryId
+      categoryId: data.categoryId,
+      ...data.status ? { status: data.status } : {}
     },
     include: {
       landlord: {
@@ -1373,7 +1412,7 @@ var stripe = new Stripe(config_default.stripe.secretKey, {
 var stripe_default = stripe;
 
 // src/modules/payment/payment.service.ts
-var createStripePayment = async (rentalRequestId, tenantId) => {
+var createStripePayment = async (rentalRequestId, tenantId, redirectBaseUrl) => {
   const rental = await prisma.rentalRequests.findUnique({
     where: { id: rentalRequestId },
     include: {
@@ -1392,6 +1431,7 @@ var createStripePayment = async (rentalRequestId, tenantId) => {
   if (hasExistingPayment)
     throw new AppError("Payment already exists for this rental request.", 409);
   const totalAmount = rental.property.rentAmount * rental.duration;
+  const baseUrl = (redirectBaseUrl || config_default.app_url || "http://localhost:3000").replace(/\/$/, "");
   const session = await stripe_default.checkout.sessions.create({
     payment_method_types: ["card"],
     mode: "payment",
@@ -1413,8 +1453,8 @@ var createStripePayment = async (rentalRequestId, tenantId) => {
       rentalRequestId,
       tenantId
     },
-    success_url: `${config_default.app_url ?? "http://localhost:3000"}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${config_default.app_url ?? "http://localhost:3000"}/payment/cancel`
+    success_url: `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${baseUrl}/payment/cancel`
   });
   try {
     const payment = await prisma.payment.create({
@@ -1568,10 +1608,13 @@ var getPaymentById = async (id, userId, role) => {
 // src/modules/payment/payment.controller.ts
 import httpStatus14 from "http-status";
 var createPayment = catchAsync(
-  async (req, res, next) => {
+  async (req, res, _next) => {
+    const originHeader = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : void 0);
+    const redirectBaseUrl = req.body.origin || req.body.redirectUrl || originHeader;
     const result = await createStripePayment(
       req.body.rentalRequestId,
-      req.user.id
+      req.user.id,
+      redirectBaseUrl
     );
     sendResponse(res, {
       success: true,
